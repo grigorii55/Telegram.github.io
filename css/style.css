@@ -8,6 +8,63 @@ strong {
 code, kbd, pre, samp {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }
+@media (max-width: 768px) {
+    body {
+        font-size: 14px; /* Меньший размер шрифта */
+    }
+
+    .message {
+        padding: 10px;
+        margin: 10px;
+    }
+
+    img {
+        width: 100%; /* Изображения будут растягиваться по ширине */
+        height: auto; /* Сохранение пропорций */
+    }
+
+    button {
+        padding: 10px;
+    }
+}
+img {
+    width: 100%; /* Сделает изображения гибкими */
+    height: auto; /* Сохраняет пропорции изображения */
+}
+@media (max-width: 600px) {
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
+/* Убираем лишний белый фон и задаём один цвет для всей страницы */
+body {
+    background-color: #f4f4f4; /* Серый фон */
+    margin: 0; /* Убираем отступы по краям */
+    padding: 0; /* Убираем внутренние отступы */
+}
+
+/* Убедитесь, что для контейнеров на странице тоже нет лишних фонов */
+.page_wrap, .page_header, .page_body {
+    background-color: #f4f4f4; /* Этот же цвет серого фона */
+}
+
+/* Проверим фон для сообщений */
+.message {
+    background-color: white; /* Белый фон для сообщений */
+}
+html, body {
+    height: 100%; /* Устанавливаем высоту в 100% для всего документа */
+}
+
+.page_wrap {
+    min-height: 100%; /* Убедитесь, что контейнер растягивается на весь экран */
+}
+.page_header, .page_body {
+    margin: 0;
+    padding: 0;
+}
+
 code {
     padding: 2px 4px;
     font-size: 90%;
