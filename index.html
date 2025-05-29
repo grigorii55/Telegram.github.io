@@ -84,18 +84,7 @@ function toggleComments(messageId) {
   }
 }
 </script>
-<script src="js/script.js" type="text/javascript">
-function showError(messageId) {
-  var commentBlock = document.getElementById('comments-' + messageId);
-  if (commentBlock) {
-    if (commentBlock.style.display === "none" || commentBlock.style.display === "") {
-      commentBlock.style.display = "block";
-    } else {
-      commentBlock.style.display = "none";
-    }
-  }
-}
-</script>
+
 </head>
 <body onload="CheckLocation();">
 <div class="page_wrap">
@@ -9791,7 +9780,7 @@ Anonymous poll
 14:21
        </div>
 <div class="media_wrap clearfix">
-<a class="media clearfix pull_left block_link media_audio_file" href="files/Часть 3.MP3">
+<a class="media clearfix pull_left block_link media_audio_file" href="https://drive.google.com/file/d/1DKo60IzzsXUuutULcNzCxfdxe5StBf8h/view?usp=sharing">
 <div class="fill pull_left">
 </div>
 <div class="body">
@@ -13330,7 +13319,7 @@ Anonymous poll
 14:21
        </div>
 <div class="media_wrap clearfix">
-<a class="media clearfix pull_left block_link media_audio_file" href="files/Часть 4.MP3">
+<a class="media clearfix pull_left block_link media_audio_file" href="https://drive.google.com/file/d/1Io2bhKXrxH9gF-AlPz5wiiGtq_I8mGl3/view?usp=sharing">
 <div class="fill pull_left">
 </div>
 <div class="body">
@@ -20237,62 +20226,53 @@ Anonymous poll
 
 <!-- МОДАЛЬНОЕ ОКНО -->
 <div id="videoModal" style="display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 10px;">
-<div style="position: relative; width: 100%; max-width: 800px;">
-<iframe allowfullscreen="" height="450" id="videoIframe" style="border: none; border-radius: 10px;" width="100%"></iframe>
-<button onclick="closeVideoModal()" style="position: absolute; top: -10px; right: -10px; background: #fff; color: #000; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 20px; cursor: pointer;">×</button>
+  <div style="position: relative; width: 100%; max-width: 800px;">
+    <iframe id="videoFrame" width="100%" height="450" style="border: none; border-radius: 10px;" allowfullscreen allow="autoplay"></iframe>
+    <button onclick="closeVideoModal()" style="position: absolute; top: -10px; right: -10px; background: #fff; color: #000; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 20px; cursor: pointer;">×</button>
+  </div>
 </div>
-</div>
-<!-- СКРИПТЫ -->
+
+<!-- СКРИПТ -->
 <script>
-  function openVideoModal() {
-    const modal = document.getElementById('videoModal');
-    const iframe = document.getElementById('videoIframe');
-    iframe.src = 'https://drive.google.com/file/d/151gZVF9zm8xlkwEl5IGROMO8hHuWNEUF/view';
-    modal.style.display = 'flex';
+  document.addEventListener("DOMContentLoaded", function () {
+    const supportedClasses = ["video_file_wrap", "media_audio_file"];
+    supportedClasses.forEach((cls) => {
+      const elements = document.querySelectorAll(`a.${cls}`);
+      elements.forEach((el) => {
+        const href = el.getAttribute("href");
+        const match = href.match(/\/d\/(.*?)\//);
+        if (match) {
+          const fileId = match[1];
+          el.addEventListener("click", function (e) {
+            e.preventDefault();
+            openVideoModal(fileId);
+          });
+          el.style.cursor = "pointer";
+        }
+      });
+    });
+  });
+
+  function openVideoModal(fileId) {
+    const modal = document.getElementById("videoModal");
+    const iframe = document.getElementById("videoFrame");
+    iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
+    modal.style.display = "flex";
   }
 
   function closeVideoModal() {
-    const modal = document.getElementById('videoModal');
-    const iframe = document.getElementById('videoIframe');
-    iframe.src = '';
-    modal.style.display = 'none';
+    const modal = document.getElementById("videoModal");
+    const iframe = document.getElementById("videoFrame");
+    iframe.src = "";
+    modal.style.display = "none";
   }
-</script>
-</div><script>
-document.addEventListener("DOMContentLoaded", function () {
-  const videoLinks = document.querySelectorAll("a.video_file_wrap");
-  videoLinks.forEach((link) => {
-    const href = link.getAttribute("href");
-    const match = href.match(/\/d\/(.*?)\//);
-    if (match) {
-      const fileId = match[1];
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        openVideoModal(fileId);
-      });
-      link.style.cursor = "pointer";
+
+  window.addEventListener("click", function (event) {
+    const modal = document.getElementById("videoModal");
+    if (event.target === modal) {
+      closeVideoModal();
     }
   });
-});
-
-function openVideoModal(fileId) {
-  const modal = document.getElementById("videoModal");
-  const iframe = document.getElementById("videoFrame");
-  iframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
-  modal.style.display = "flex";
-}
-
-function closeVideoModal() {
-  const modal = document.getElementById("videoModal");
-  const iframe = document.getElementById("videoFrame");
-  iframe.src = "";
-  modal.style.display = "none";
-}
-
-window.addEventListener("click", function (event) {
-  const modal = document.getElementById("videoModal");
-  if (event.target === modal) {
-    closeVideoModal();
-  }
-});
-</script></body></html>
+</script>
+</body>
+</html>
