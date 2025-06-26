@@ -48,6 +48,17 @@
          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
        }
      </style>
+<style>
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  </style>
+  
 <!-- Модальное окно -->
 <div class="modal" id="videoModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8);">
 <div style="position:relative; margin:5% auto; width:90%; max-width:800px;">
@@ -62,6 +73,9 @@
     iframe.src = "https://drive.google.com/file/d/1h0ChoUBUs0zZNspNCUsfS8KX7vp0pLK6/preview";
     modal.style.display = "block";
   }
+thumbEl.onclick = function() {
+  showMediaPreview(full, text, id); // передаём в предпросмотр
+};
 
   function closeModal() {
     var modal = document.getElementById("videoModal");
@@ -20183,30 +20197,37 @@ Anonymous poll
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(3px);
+  background-color: rgba(0,0,0,0.8);
+  animation: fadeIn 0.3s ease forwards;
 ">
-  <div style="
-    position: relative;
-    margin: 5% auto;
+
+    <div style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 90%;
-    max-width: 480px;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 30px 24px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    max-height: 90vh;
     overflow-y: auto;
-    max-height: 90%;
-    font-family: 'Segoe UI', sans-serif;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: scaleIn 0.3s ease forwards;
   ">
+
+
     <span onclick="closeChannelInfo()" style="
-      position: absolute;
-      top: 14px;
-      right: 20px;
-      font-size: 28px;
-      color: #888;
-      cursor: pointer;
-    ">×</span>
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 30px;
+  color: #8A0000;
+  cursor: pointer;
+  z-index: 10;
+">×</span>
+
 
     <div style="text-align: center; margin-bottom: 20px;">
       <img src="photos/Бейдж.jpg" alt="Аватарка" style="
@@ -20315,6 +20336,38 @@ Anonymous poll
 </div>
 
 <script>
+  (function translateDates() {
+    const monthMap = {
+      January: 'января',
+      February: 'февраля',
+      March: 'марта',
+      April: 'апреля',
+      May: 'мая',
+      June: 'июня',
+      July: 'июля',
+      August: 'августа',
+      September: 'сентября',
+      October: 'октября',
+      November: 'ноября',
+      December: 'декабря'
+    };
+  
+    document.querySelectorAll(".message .body.details").forEach(el => {
+      const match = el.textContent.match(/(\d{1,2}) (\w+)( \d{4})?/);
+      if (!match) return;
+  
+      const day = match[1];
+      const enMonth = match[2];
+      const year = match[3] || '';
+  
+      if (monthMap[enMonth]) {
+        el.textContent = `${day} ${monthMap[enMonth]}${year}`;
+      }
+    });
+  })();
+  </script>
+  
+<script>
 let targetLink = '';
 
 function formatMonthYear(dateStr) {
@@ -20373,23 +20426,28 @@ function showMedia(type) {
     } else if (type === 'video') {
       const link = msg.querySelector("a.video_file_wrap");
       const thumb = msg.querySelector("img.video_file");
+      const duration = msg.querySelector(".video_duration")?.innerText.trim();
       if (link && thumb) {
         item = {
           type: 'video',
           src: thumb.getAttribute('src'),
+          duration: duration,
           link: `#${messageId}`
         };
       }
     } else if (type === 'audio') {
-      const audioLink = msg.querySelector("a.media_audio_file");
-      if (audioLink) {
-        item = {
-          type: 'audio',
-          src: 'photos/photo_18@12-12-2024_20-59-39.jpg',
-          link: `#${messageId}`
-        };
-      }
-    }
+  const audioLink = msg.querySelector("a.media_audio_file");
+  const duration = audioLink?.querySelector(".status")?.innerText.trim();
+  if (audioLink) {
+    item = {
+      type: 'audio',
+      src: 'photos/photo_18@12-12-2024_20-59-39.jpg',
+      duration: duration,
+      link: `#${messageId}`
+    };
+  }
+}
+
 
     if (item) {
       if (!grouped[groupKey]) grouped[groupKey] = [];
@@ -20412,6 +20470,10 @@ function showMedia(type) {
 
     grouped[month].forEach(item => {
       const wrap = document.createElement("div");
+
+      const container = document.createElement("div");
+      container.style.position = "relative";
+
       const img = document.createElement("img");
       img.src = item.src;
       img.style.width = "100%";
@@ -20420,7 +20482,25 @@ function showMedia(type) {
       img.style.borderRadius = "10px";
       img.style.cursor = "pointer";
       img.onclick = () => showGotoPopup(item.link);
-      wrap.appendChild(img);
+      container.appendChild(img);
+
+      if ((item.type === 'video' || item.type === 'audio') && item.duration) {
+
+        const durationTag = document.createElement("div");
+        durationTag.textContent = item.duration;
+        durationTag.style.position = "absolute";
+        durationTag.style.bottom = "6px";
+        durationTag.style.right = "6px";
+        durationTag.style.background = "rgba(0, 0, 0, 0.6)";
+        durationTag.style.color = "white";
+        durationTag.style.fontSize = "12px";
+        durationTag.style.padding = "2px 6px";
+        durationTag.style.borderRadius = "6px";
+        durationTag.style.pointerEvents = "none";
+        container.appendChild(durationTag);
+      }
+
+      wrap.appendChild(container);
       grid.appendChild(wrap);
     });
 
@@ -20433,5 +20513,73 @@ function showMedia(type) {
   }
 }
 
-</script></body>
+
+</script>
+<!-- Предпросмотр медиа -->
+<div id="mediaPreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:rgba(0,0,0,0.85); padding-top:5vh; text-align:center;">
+  <div style="background:#fff; display:inline-block; padding:20px; border-radius:12px; max-width:90%; max-height:90%; overflow:auto; position:relative; animation:scaleIn 0.3s;">
+    <span onclick="closePreviewModal()" style="position:absolute; top:10px; right:15px; font-size:28px; color:#333; cursor:pointer;">×</span>
+    <div id="mediaPreviewContent"></div>
+    <div id="mediaPreviewText" style="margin-top:15px; text-align:left; color:#333;"></div>
+    <br/>
+    <button onclick="openConfirmModal()" style="padding:10px 20px; background:#8A0000; color:white; border:none; border-radius:8px;">Перейти к сообщению?</button>
+  </div>
+</div>
+
+<!-- Окно подтверждения перехода -->
+<div id="goToMessageModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; text-align:center;">
+  <div style="background:#fff; display:inline-block; padding:30px; border-radius:12px; margin-top:20vh; position:relative; animation:scaleIn 0.3s;">
+    <span onclick="closeConfirmModal()" style="position:absolute; top:10px; right:15px; font-size:28px; color:#333; cursor:pointer;">×</span>
+    <div style="font-size:18px; margin-bottom:20px;">Перейти к сообщению?</div>
+    <button onclick="goToOriginalMessage()" style="padding:10px 20px; background:#8A0000; color:white; border:none; border-radius:8px;">Да</button>
+    <button onclick="closeConfirmModal()" style="padding:10px 20px; margin-left:10px; background:#ccc; border:none; border-radius:8px;">Нет</button>
+  </div>
+</div>
+
+<script>
+let currentMessageId = null;
+
+// Функция показа предпросмотра
+function showMediaPreview(fullSrc, messageText, messageId) {
+  currentMessageId = messageId;
+  const ext = fullSrc.split('.').pop().toLowerCase();
+  let content = '';
+
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+    content = `<img src="${fullSrc}" style="max-width:100%; border-radius:12px;">`;
+  } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+    content = `<video controls style="max-width:100%; border-radius:12px;"><source src="${fullSrc}"></video>`;
+  } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
+    content = `<audio controls style="width:100%;"><source src="${fullSrc}"></audio>`;
+  }
+
+  document.getElementById('mediaPreviewContent').innerHTML = content;
+  document.getElementById('mediaPreviewText').innerHTML = messageText;
+  document.getElementById('mediaPreviewModal').style.display = 'block';
+}
+
+function closePreviewModal() {
+  document.getElementById('mediaPreviewModal').style.display = 'none';
+  currentMessageId = null;
+}
+
+function openConfirmModal() {
+  document.getElementById('goToMessageModal').style.display = 'block';
+}
+
+function closeConfirmModal() {
+  document.getElementById('goToMessageModal').style.display = 'none';
+}
+
+function goToOriginalMessage() {
+  if (currentMessageId) {
+    location.hash = "#" + currentMessageId;
+    closePreviewModal();
+    closeConfirmModal();
+  }
+}
+</script>
+
+</body>
+
 </html>
